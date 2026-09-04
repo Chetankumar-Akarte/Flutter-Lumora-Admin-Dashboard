@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../dashboard/views/dashboard_screen.dart';
+import '../../profile/views/profile_screen.dart';
 import '../viewmodel/navigation_provider.dart';
 import 'app_footer.dart';
 import 'app_sidebar.dart';
@@ -72,6 +73,10 @@ class _AppShellState extends ConsumerState<AppShell> {
       case 'dashboard-saas':
       case 'dashboard-support':
         return const DashboardScreen();
+      case 'profile':
+      case 'user-profile':
+      case 'pages-profile':
+        return const ProfileScreen();
       default:
         return Center(
           child: Column(

@@ -64,6 +64,12 @@ class AppTheme {
         ),
         hintStyle: AppTypography.body(fontSize: 13, color: AppColors.lightTextSoft),
       ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF1E293B),
+        contentTextStyle: AppTypography.body(fontSize: 13.5, color: Colors.white, fontWeight: FontWeight.w500),
+        shape: RoundedRectangleBorder(borderRadius: AppDimensions.rMd),
+      ),
     );
   }
 
@@ -124,6 +130,15 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.brandDark, width: 1.5),
         ),
         hintStyle: AppTypography.body(fontSize: 13, color: AppColors.darkTextSoft),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.darkSurface3,
+        contentTextStyle: AppTypography.body(fontSize: 13.5, color: Colors.white, fontWeight: FontWeight.w500),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppDimensions.rMd,
+          side: const BorderSide(color: AppColors.darkBorder),
+        ),
       ),
     );
   }

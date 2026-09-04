@@ -9,12 +9,14 @@ class AppTypography {
     FontWeight fontWeight = FontWeight.w600,
     Color? color,
     double? height,
+    double? letterSpacing,
   }) {
     return GoogleFonts.josefinSans(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
       height: height,
+      letterSpacing: letterSpacing,
     );
   }
 
@@ -23,12 +25,14 @@ class AppTypography {
     FontWeight fontWeight = FontWeight.w400,
     Color? color,
     double? height = 1.5,
+    double? letterSpacing,
   }) {
     return GoogleFonts.josefinSans(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
       height: height,
+      letterSpacing: letterSpacing,
     );
   }
 
@@ -37,12 +41,28 @@ class AppTypography {
     FontWeight fontWeight = FontWeight.w600,
     Color? color,
     double? height,
+    double? letterSpacing,
   }) {
     return GoogleFonts.josefinSans(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
       height: height,
+      letterSpacing: letterSpacing,
+    );
+  }
+
+  static TextStyle brand({
+    double fontSize = 18,
+    FontWeight fontWeight = FontWeight.w700,
+    Color? color,
+    double? letterSpacing,
+  }) {
+    return GoogleFonts.josefinSans(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
     );
   }
 
@@ -50,11 +70,13 @@ class AppTypography {
     double fontSize = 13,
     FontWeight fontWeight = FontWeight.w400,
     Color? color,
+    double? letterSpacing,
   }) {
     return GoogleFonts.jetBrainsMono(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
+      letterSpacing: letterSpacing,
     );
   }
 }

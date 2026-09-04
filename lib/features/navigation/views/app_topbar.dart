@@ -647,6 +647,8 @@ class AppTopbar extends ConsumerWidget implements PreferredSizeWidget {
             onSelected: (val) {
               if (val == 'dark_mode') {
                 themeModeNotifier.toggleTheme();
+              } else if (val == 'profile') {
+                navNotifier.selectPage('profile');
               }
             },
             itemBuilder: (context) => [

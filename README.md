@@ -281,7 +281,7 @@ Following the complete roadmap of the **[Lumora UI Kit Ecosystem](https://github
 - [ ] Forgot & Reset Password Screens
 - [ ] Two-Factor Authentication (OTP / 2FA verification)
 - [ ] Lock Screen / Session Timeout
-- [ ] User Profile & Account Settings
+- [x] **User Profile & Account Settings** *(Admin Profile Screen)*
 - [ ] Roles, Permissions & Access Control Matrix
 
 ---

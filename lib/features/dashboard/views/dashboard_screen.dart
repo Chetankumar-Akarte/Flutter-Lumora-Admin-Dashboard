@@ -148,47 +148,50 @@ class DashboardScreen extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Dashboard',
-              style: AppTypography.heading(
-                fontSize: isMobile ? 20 : 24,
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurface,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Dashboard',
+                style: AppTypography.heading(
+                  fontSize: isMobile ? 20 : 24,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Text(
-                  'Home',
-                  style: AppTypography.body(
-                    fontSize: 12,
-                    color: theme.textTheme.bodySmall?.color,
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Text(
+                    'Home',
+                    style: AppTypography.body(
+                      fontSize: 12,
+                      color: theme.textTheme.bodySmall?.color,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    size: 14,
-                    color: theme.textTheme.bodySmall?.color,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 14,
+                      color: theme.textTheme.bodySmall?.color,
+                    ),
                   ),
-                ),
-                Text(
-                  'Overview',
-                  style: AppTypography.body(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                  Text(
+                    'Overview',
+                    style: AppTypography.body(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 8),
         AppButton(
           text: 'New report',
           icon: const FaIcon(FontAwesomeIcons.plus, size: 12, color: Colors.white),

@@ -7,6 +7,18 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/widgets/avatar_badge.dart';
 import '../viewmodel/navigation_provider.dart';
 
+class SidebarSubItem {
+  final String label;
+  final String pageKey;
+  final String? badge;
+
+  const SidebarSubItem({
+    required this.label,
+    required this.pageKey,
+    this.badge,
+  });
+}
+
 class AppSidebar extends ConsumerWidget {
   final bool isDrawer;
 
@@ -24,6 +36,8 @@ class AppSidebar extends ConsumerWidget {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      clipBehavior: Clip.hardEdge,
       width: width,
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
@@ -44,43 +58,52 @@ class AppSidebar extends ConsumerWidget {
               mainAxisAlignment: isCollapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
               children: [
                 // Brand Mark Logo
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF5B5BF7), Color(0xFF8B5CF6)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                Tooltip(
+                  message: isCollapsed ? 'Expand sidebar' : 'Lumora',
+                  child: InkWell(
+                    onTap: isCollapsed ? () => navNotifier.toggleSidebar() : null,
                     borderRadius: AppDimensions.rMd,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.brand.withValues(alpha: 0.35),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF5B5BF7), Color(0xFF8B5CF6)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: AppDimensions.rMd,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.brand.withValues(alpha: 0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: FaIcon(
-                      FontAwesomeIcons.cubes,
-                      color: Colors.white,
-                      size: 18,
+                      child: const Center(
+                        child: FaIcon(
+                          FontAwesomeIcons.cubes,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 if (!isCollapsed) ...[
                   const SizedBox(width: 12),
-                  Text(
-                    'Lumora',
-                    style: AppTypography.heading(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.onSurface,
+                  Expanded(
+                    child: Text(
+                      'Lumora',
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.heading(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
                   ),
-                  const Spacer(),
                   if (!isDrawer)
                     IconButton(
                       icon: const Icon(Icons.menu_open_rounded, size: 20),
@@ -96,7 +119,10 @@ class AppSidebar extends ConsumerWidget {
           // 2. Nav Items Scrollable
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+              padding: EdgeInsets.symmetric(
+                vertical: 12,
+                horizontal: isCollapsed ? 8 : 10,
+              ),
               children: [
                 // ==================== MAIN ====================
                 if (!isCollapsed)
@@ -124,20 +150,23 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Dashboards',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('dashboards'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Analytics', 'dashboard-analytics', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('E-commerce', 'dashboard-ecommerce', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('CRM', 'dashboard-crm', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Project', 'dashboard-project', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Finance', 'dashboard-finance', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('HRM', 'dashboard-hrm', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('SaaS', 'dashboard-saas', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Support', 'dashboard-support', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Warehouse', 'dashboard-warehouse', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Operations', 'dashboard-operations', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Analytics', pageKey: 'dashboard-analytics'),
+                    SidebarSubItem(label: 'E-commerce', pageKey: 'dashboard-ecommerce'),
+                    SidebarSubItem(label: 'CRM', pageKey: 'dashboard-crm'),
+                    SidebarSubItem(label: 'Project', pageKey: 'dashboard-project'),
+                    SidebarSubItem(label: 'Finance', pageKey: 'dashboard-finance'),
+                    SidebarSubItem(label: 'HRM', pageKey: 'dashboard-hrm'),
+                    SidebarSubItem(label: 'SaaS', pageKey: 'dashboard-saas'),
+                    SidebarSubItem(label: 'Support', pageKey: 'dashboard-support'),
+                    SidebarSubItem(label: 'Warehouse', pageKey: 'dashboard-warehouse'),
+                    SidebarSubItem(label: 'Operations', pageKey: 'dashboard-operations'),
                   ],
                 ),
 
@@ -147,17 +176,20 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Apps',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('apps'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Chat', 'chat', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Email', 'email', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Calendar', 'calendar', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Kanban', 'kanban', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('File Manager', 'file-manager', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Gallery', 'gallery', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Contacts', 'contacts', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Chat', pageKey: 'chat'),
+                    SidebarSubItem(label: 'Email', pageKey: 'email'),
+                    SidebarSubItem(label: 'Calendar', pageKey: 'calendar'),
+                    SidebarSubItem(label: 'Kanban', pageKey: 'kanban'),
+                    SidebarSubItem(label: 'File Manager', pageKey: 'file-manager'),
+                    SidebarSubItem(label: 'Gallery', pageKey: 'gallery'),
+                    SidebarSubItem(label: 'Contacts', pageKey: 'contacts'),
                   ],
                 ),
 
@@ -167,17 +199,20 @@ class AppSidebar extends ConsumerWidget {
                   label: 'E-commerce',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('ecommerce'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Dashboard', 'dashboard-ecommerce', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Products', 'products', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Orders', 'orders', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Customers', 'customers', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Categories', 'categories', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Inventory', 'inventory', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Invoice', 'invoice', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Dashboard', pageKey: 'dashboard-ecommerce'),
+                    SidebarSubItem(label: 'Products', pageKey: 'products'),
+                    SidebarSubItem(label: 'Orders', pageKey: 'orders'),
+                    SidebarSubItem(label: 'Customers', pageKey: 'customers'),
+                    SidebarSubItem(label: 'Categories', pageKey: 'categories'),
+                    SidebarSubItem(label: 'Inventory', pageKey: 'inventory'),
+                    SidebarSubItem(label: 'Invoice', pageKey: 'invoice'),
                   ],
                 ),
 
@@ -187,16 +222,19 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Authentication',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('auth'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Login', 'login', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Register', 'register', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Forgot Password', 'forgot-password', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Reset Password', 'reset-password', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Verify OTP', 'verify-otp', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Lock Screen', 'lock-screen', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Login', pageKey: 'login'),
+                    SidebarSubItem(label: 'Register', pageKey: 'register'),
+                    SidebarSubItem(label: 'Forgot Password', pageKey: 'forgot-password'),
+                    SidebarSubItem(label: 'Reset Password', pageKey: 'reset-password'),
+                    SidebarSubItem(label: 'Verify OTP', pageKey: 'verify-otp'),
+                    SidebarSubItem(label: 'Lock Screen', pageKey: 'lock-screen'),
                   ],
                 ),
 
@@ -207,14 +245,17 @@ class AppSidebar extends ConsumerWidget {
                   badge: '12',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('users'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('All Users', 'users-list', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('User Profile', 'user-profile', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Roles & Permissions', 'roles', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Permissions', 'permissions', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'All Users', pageKey: 'users-list'),
+                    SidebarSubItem(label: 'User Profile', pageKey: 'user-profile'),
+                    SidebarSubItem(label: 'Roles & Permissions', pageKey: 'roles'),
+                    SidebarSubItem(label: 'Permissions', pageKey: 'permissions'),
                   ],
                 ),
 
@@ -231,17 +272,20 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Layout Pages',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('layouts'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Sidebar Light', 'sidebar-light', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Sidebar Dark', 'sidebar-dark', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Sidebar Compact', 'sidebar-compact', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Icon Only', 'sidebar-icon-only', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Hidden Sidebar', 'sidebar-hidden', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Boxed Layout', 'boxed-layout', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Fluid Layout', 'fluid-layout', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Sidebar Light', pageKey: 'sidebar-light'),
+                    SidebarSubItem(label: 'Sidebar Dark', pageKey: 'sidebar-dark'),
+                    SidebarSubItem(label: 'Sidebar Compact', pageKey: 'sidebar-compact'),
+                    SidebarSubItem(label: 'Icon Only', pageKey: 'sidebar-icon-only'),
+                    SidebarSubItem(label: 'Hidden Sidebar', pageKey: 'sidebar-hidden'),
+                    SidebarSubItem(label: 'Boxed Layout', pageKey: 'boxed-layout'),
+                    SidebarSubItem(label: 'Fluid Layout', pageKey: 'fluid-layout'),
                   ],
                 ),
 
@@ -272,26 +316,29 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Basic UI',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('basic-ui'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Buttons', 'ui-buttons', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Cards', 'ui-cards', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Alerts', 'ui-alerts', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Badges', 'ui-badges', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Tabs', 'ui-tabs', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Modals', 'ui-modals', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Dropdowns', 'ui-dropdowns', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Avatars', 'ui-avatars', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Progress', 'ui-progress', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Tooltips & Popovers', 'ui-tooltips', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Accordion', 'ui-accordion', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Offcanvas', 'ui-offcanvas', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Toasts', 'ui-toasts', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Pagination', 'ui-pagination', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('List Group', 'ui-list-group', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Typography', 'ui-typography', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Buttons', pageKey: 'ui-buttons'),
+                    SidebarSubItem(label: 'Cards', pageKey: 'ui-cards'),
+                    SidebarSubItem(label: 'Alerts', pageKey: 'ui-alerts'),
+                    SidebarSubItem(label: 'Badges', pageKey: 'ui-badges'),
+                    SidebarSubItem(label: 'Tabs', pageKey: 'ui-tabs'),
+                    SidebarSubItem(label: 'Modals', pageKey: 'ui-modals'),
+                    SidebarSubItem(label: 'Dropdowns', pageKey: 'ui-dropdowns'),
+                    SidebarSubItem(label: 'Avatars', pageKey: 'ui-avatars'),
+                    SidebarSubItem(label: 'Progress', pageKey: 'ui-progress'),
+                    SidebarSubItem(label: 'Tooltips & Popovers', pageKey: 'ui-tooltips'),
+                    SidebarSubItem(label: 'Accordion', pageKey: 'ui-accordion'),
+                    SidebarSubItem(label: 'Offcanvas', pageKey: 'ui-offcanvas'),
+                    SidebarSubItem(label: 'Toasts', pageKey: 'ui-toasts'),
+                    SidebarSubItem(label: 'Pagination', pageKey: 'ui-pagination'),
+                    SidebarSubItem(label: 'List Group', pageKey: 'ui-list-group'),
+                    SidebarSubItem(label: 'Typography', pageKey: 'ui-typography'),
                   ],
                 ),
 
@@ -301,19 +348,22 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Advanced UI',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('advanced-ui'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Popups', 'ui-popups', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Notifications', 'ui-notifications', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Draggable', 'ui-draggable', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Clipboard', 'ui-clipboard', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Context Menu', 'ui-context-menu', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Sliders', 'ui-sliders', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Carousel', 'ui-carousel', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Tree View', 'ui-treeview', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Loaders', 'ui-loaders', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Popups', pageKey: 'ui-popups'),
+                    SidebarSubItem(label: 'Notifications', pageKey: 'ui-notifications'),
+                    SidebarSubItem(label: 'Draggable', pageKey: 'ui-draggable'),
+                    SidebarSubItem(label: 'Clipboard', pageKey: 'ui-clipboard'),
+                    SidebarSubItem(label: 'Context Menu', pageKey: 'ui-context-menu'),
+                    SidebarSubItem(label: 'Sliders', pageKey: 'ui-sliders'),
+                    SidebarSubItem(label: 'Carousel', pageKey: 'ui-carousel'),
+                    SidebarSubItem(label: 'Tree View', pageKey: 'ui-treeview'),
+                    SidebarSubItem(label: 'Loaders', pageKey: 'ui-loaders'),
                   ],
                 ),
 
@@ -323,17 +373,20 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Forms',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('forms'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Basic Forms', 'forms-basic', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Advanced Forms', 'forms-advanced', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Validation', 'forms-validation', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Wizard', 'forms-wizard', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('File Upload', 'forms-upload', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Text Editor', 'forms-editor', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Code Editor', 'forms-code', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Basic Forms', pageKey: 'forms-basic'),
+                    SidebarSubItem(label: 'Advanced Forms', pageKey: 'forms-advanced'),
+                    SidebarSubItem(label: 'Validation', pageKey: 'forms-validation'),
+                    SidebarSubItem(label: 'Wizard', pageKey: 'forms-wizard'),
+                    SidebarSubItem(label: 'File Upload', pageKey: 'forms-upload'),
+                    SidebarSubItem(label: 'Text Editor', pageKey: 'forms-editor'),
+                    SidebarSubItem(label: 'Code Editor', pageKey: 'forms-code'),
                   ],
                 ),
 
@@ -343,13 +396,16 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Tables',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('tables'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Basic Tables', 'tables-basic', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('DataTables', 'tables-datatables', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Editable Tables', 'tables-editable', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Basic Tables', pageKey: 'tables-basic'),
+                    SidebarSubItem(label: 'DataTables', pageKey: 'tables-datatables'),
+                    SidebarSubItem(label: 'Editable Tables', pageKey: 'tables-editable'),
                   ],
                 ),
 
@@ -359,14 +415,17 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Charts',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('charts'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Apex Charts', 'charts-apex', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Chart.js', 'charts-chartjs', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Morris', 'charts-morris', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Sparkline', 'charts-sparkline', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Apex Charts', pageKey: 'charts-apex'),
+                    SidebarSubItem(label: 'Chart.js', pageKey: 'charts-chartjs'),
+                    SidebarSubItem(label: 'Morris', pageKey: 'charts-morris'),
+                    SidebarSubItem(label: 'Sparkline', pageKey: 'charts-sparkline'),
                   ],
                 ),
 
@@ -376,13 +435,16 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Maps',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('maps'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Google Maps', 'maps-google', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Leaflet', 'maps-leaflet', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Vector Maps', 'maps-vector', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Google Maps', pageKey: 'maps-google'),
+                    SidebarSubItem(label: 'Leaflet', pageKey: 'maps-leaflet'),
+                    SidebarSubItem(label: 'Vector Maps', pageKey: 'maps-vector'),
                   ],
                 ),
 
@@ -392,13 +454,16 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Icons Pages',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('icons-pages'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Font Awesome', 'icons-fa', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Material Design', 'icons-material', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Flag Icons', 'icons-flag', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Font Awesome', pageKey: 'icons-fa'),
+                    SidebarSubItem(label: 'Material Design', pageKey: 'icons-material'),
+                    SidebarSubItem(label: 'Flag Icons', pageKey: 'icons-flag'),
                   ],
                 ),
 
@@ -408,16 +473,19 @@ class AppSidebar extends ConsumerWidget {
                   label: 'General Pages',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('general-pages'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('Blank Page', 'pages-blank', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('FAQ', 'pages-faq', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Notifications', 'pages-notifications', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Pricing', 'pages-pricing', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Search Results', 'pages-search', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Timeline', 'pages-timeline', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: 'Blank Page', pageKey: 'pages-blank'),
+                    SidebarSubItem(label: 'FAQ', pageKey: 'pages-faq'),
+                    SidebarSubItem(label: 'Notifications', pageKey: 'pages-notifications'),
+                    SidebarSubItem(label: 'Pricing', pageKey: 'pages-pricing'),
+                    SidebarSubItem(label: 'Search Results', pageKey: 'pages-search'),
+                    SidebarSubItem(label: 'Timeline', pageKey: 'pages-timeline'),
                   ],
                 ),
 
@@ -427,15 +495,18 @@ class AppSidebar extends ConsumerWidget {
                   label: 'Error Pages',
                   isCollapsed: isCollapsed,
                   expandedMenus: navState.expandedMenus,
-                  onToggle: () => navNotifier.toggleSubmenu('error-pages'),
+                  selectedPage: navState.selectedPage,
+                  navNotifier: navNotifier,
+                  isDrawer: isDrawer,
+                  context: context,
                   theme: theme,
                   isDark: isDark,
-                  children: [
-                    _buildSubItem('404', 'errors-404', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('500', 'errors-500', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('403', 'errors-403', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Maintenance', 'errors-maintenance', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
-                    _buildSubItem('Coming Soon', 'errors-coming-soon', navState.selectedPage, navNotifier, isDrawer, context, theme, isDark),
+                  subItems: const [
+                    SidebarSubItem(label: '404', pageKey: 'errors-404'),
+                    SidebarSubItem(label: '500', pageKey: 'errors-500'),
+                    SidebarSubItem(label: '403', pageKey: 'errors-403'),
+                    SidebarSubItem(label: 'Maintenance', pageKey: 'errors-maintenance'),
+                    SidebarSubItem(label: 'Coming Soon', pageKey: 'errors-coming-soon'),
                   ],
                 ),
 
@@ -506,61 +577,73 @@ class AppSidebar extends ConsumerWidget {
           ),
 
           // 3. Sidebar Footer User Profile
-          Container(
-            height: 64,
-            padding: EdgeInsets.symmetric(
-              horizontal: isCollapsed ? 12 : 16,
-            ),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: theme.colorScheme.outline)),
-            ),
-            child: isCollapsed
-                ? const Center(
-                    child: AvatarBadge(
-                      imageUrl: 'https://avatars.githubusercontent.com/u/27378345?v=4',
-                      size: 34,
-                      isOnline: true,
-                    ),
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const AvatarBadge(
-                        imageUrl: 'https://avatars.githubusercontent.com/u/27378345?v=4',
-                        size: 34,
-                        isOnline: true,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Chetankumar Akarte',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTypography.heading(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Senior Solution Architect',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTypography.body(
-                                fontSize: 11,
-                                color: theme.textTheme.bodySmall?.color,
-                              ),
-                            ),
-                          ],
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                navNotifier.selectPage('profile');
+                if (isDrawer) Navigator.of(context).pop();
+              },
+              child: Container(
+                height: 64,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isCollapsed ? 12 : 16,
+                ),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: theme.colorScheme.outline)),
+                ),
+                child: isCollapsed
+                    ? const Center(
+                        child: Tooltip(
+                          message: 'Chetankumar Akarte\nSenior Solution Architect',
+                          child: AvatarBadge(
+                            imageUrl: 'https://avatars.githubusercontent.com/u/27378345?v=4',
+                            size: 34,
+                            isOnline: true,
+                          ),
                         ),
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const AvatarBadge(
+                            imageUrl: 'https://avatars.githubusercontent.com/u/27378345?v=4',
+                            size: 34,
+                            isOnline: true,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Chetankumar Akarte',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.heading(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Senior Solution Architect',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.body(
+                                    fontSize: 11,
+                                    color: theme.textTheme.bodySmall?.color,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+              ),
+            ),
           ),
         ],
       ),
@@ -596,7 +679,7 @@ class AppSidebar extends ConsumerWidget {
     final activeBg = isDark ? AppColors.brandDarkSoft : AppColors.brandSoft;
     final activeColor = isDark ? AppColors.brandDark : AppColors.brand;
 
-    return Padding(
+    final itemWidget = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: InkWell(
         onTap: onTap,
@@ -623,6 +706,8 @@ class AppSidebar extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: AppTypography.heading(
                       fontSize: 13,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
@@ -652,6 +737,16 @@ class AppSidebar extends ConsumerWidget {
         ),
       ),
     );
+
+    if (isCollapsed) {
+      return Tooltip(
+        message: label,
+        waitDuration: const Duration(milliseconds: 300),
+        child: itemWidget,
+      );
+    }
+
+    return itemWidget;
   }
 
   Widget _buildExpandableNavItem({
@@ -660,33 +755,60 @@ class AppSidebar extends ConsumerWidget {
     required String label,
     required bool isCollapsed,
     required Set<String> expandedMenus,
-    required VoidCallback onToggle,
+    required String selectedPage,
+    required NavigationNotifier navNotifier,
+    required bool isDrawer,
+    required BuildContext context,
     required ThemeData theme,
     required bool isDark,
-    required List<Widget> children,
+    required List<SidebarSubItem> subItems,
     String? badge,
   }) {
     final isExpanded = expandedMenus.contains(menuKey);
+    final isAnyChildSelected = subItems.any((item) => item.pageKey == selectedPage);
     final activeColor = isDark ? AppColors.brandDark : AppColors.brand;
+    final activeBg = isDark ? AppColors.brandDarkSoft : AppColors.brandSoft;
 
     if (isCollapsed) {
       return Tooltip(
         message: label,
+        waitDuration: const Duration(milliseconds: 300),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: InkWell(
-            onTap: onToggle,
-            borderRadius: AppDimensions.rMd,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: FaIcon(
-                  icon,
-                  size: 15,
-                  color: isExpanded ? activeColor : theme.textTheme.bodyMedium?.color,
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Builder(
+            builder: (buttonContext) {
+              return InkWell(
+                onTap: () {
+                  _showFlyoutMenu(
+                    context: buttonContext,
+                    label: label,
+                    icon: icon,
+                    badge: badge,
+                    subItems: subItems,
+                    selectedPage: selectedPage,
+                    navNotifier: navNotifier,
+                    isDrawer: isDrawer,
+                    theme: theme,
+                    isDark: isDark,
+                  );
+                },
+                borderRadius: AppDimensions.rMd,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isAnyChildSelected ? activeBg : Colors.transparent,
+                    borderRadius: AppDimensions.rMd,
+                  ),
+                  child: Center(
+                    child: FaIcon(
+                      icon,
+                      size: 15,
+                      color: isAnyChildSelected ? activeColor : theme.textTheme.bodyMedium?.color,
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       );
@@ -698,7 +820,7 @@ class AppSidebar extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            onTap: onToggle,
+            onTap: () => navNotifier.toggleSubmenu(menuKey),
             borderRadius: AppDimensions.rMd,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -707,16 +829,20 @@ class AppSidebar extends ConsumerWidget {
                   FaIcon(
                     icon,
                     size: 15,
-                    color: isExpanded ? activeColor : theme.textTheme.bodyMedium?.color,
+                    color: (isExpanded || isAnyChildSelected)
+                        ? activeColor
+                        : theme.textTheme.bodyMedium?.color,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: AppTypography.heading(
                         fontSize: 13,
-                        fontWeight: isExpanded ? FontWeight.w600 : FontWeight.w500,
-                        color: isExpanded ? activeColor : theme.colorScheme.onSurface,
+                        fontWeight: (isExpanded || isAnyChildSelected) ? FontWeight.w600 : FontWeight.w500,
+                        color: (isExpanded || isAnyChildSelected) ? activeColor : theme.colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -755,12 +881,184 @@ class AppSidebar extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(left: 28, top: 4, bottom: 4),
               child: Column(
-                children: children,
+                children: subItems
+                    .map((item) => _buildSubItem(
+                          item.label,
+                          item.pageKey,
+                          selectedPage,
+                          navNotifier,
+                          isDrawer,
+                          context,
+                          theme,
+                          isDark,
+                          badge: item.badge,
+                        ))
+                    .toList(),
               ),
             ),
         ],
       ),
     );
+  }
+
+  void _showFlyoutMenu({
+    required BuildContext context,
+    required String label,
+    required FaIconData icon,
+    required String? badge,
+    required List<SidebarSubItem> subItems,
+    required String selectedPage,
+    required NavigationNotifier navNotifier,
+    required bool isDrawer,
+    required ThemeData theme,
+    required bool isDark,
+  }) {
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final translation = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+    if (overlay == null) return;
+
+    final position = RelativeRect.fromRect(
+      Rect.fromLTWH(
+        translation.dx + size.width + 6,
+        translation.dy - 6,
+        size.width,
+        size.height,
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    final activeColor = isDark ? AppColors.brandDark : AppColors.brand;
+    final activeBg = isDark ? AppColors.brandDarkSoft : AppColors.brandSoft;
+    final surfaceColor = isDark ? AppColors.darkSurface2 : AppColors.lightSurface;
+
+    showMenu<String>(
+      context: context,
+      position: position,
+      elevation: 12,
+      shadowColor: Colors.black.withValues(alpha: 0.25),
+      constraints: const BoxConstraints(
+        minWidth: 200,
+        maxWidth: 260,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: AppDimensions.rLg,
+        side: BorderSide(
+          color: isDark ? const Color(0xFF2A2E3D) : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+      ),
+      color: surfaceColor,
+      surfaceTintColor: Colors.transparent,
+      items: [
+        // Category Header
+        PopupMenuItem<String>(
+          enabled: false,
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          child: Row(
+            children: [
+              FaIcon(icon, size: 13, color: activeColor),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.heading(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              if (badge != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: activeBg,
+                    borderRadius: AppDimensions.rPill,
+                  ),
+                  child: Text(
+                    badge,
+                    style: AppTypography.heading(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: activeColor,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        // Submenu items
+        ...subItems.map((subItem) {
+          final isSelected = selectedPage == subItem.pageKey;
+          return PopupMenuItem<String>(
+            value: subItem.pageKey,
+            height: 34,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected ? activeBg : Colors.transparent,
+                borderRadius: AppDimensions.rSm,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected ? activeColor : (theme.textTheme.bodySmall?.color ?? Colors.grey),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      subItem.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.body(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        color: isSelected ? activeColor : theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  ),
+                  if (subItem.badge != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: activeBg,
+                        borderRadius: AppDimensions.rPill,
+                      ),
+                      child: Text(
+                        subItem.badge!,
+                        style: AppTypography.heading(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: activeColor,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
+    ).then((value) {
+      if (value != null) {
+        navNotifier.selectPage(value);
+        if (isDrawer && context.mounted) Navigator.of(context).pop();
+      }
+    });
   }
 
   Widget _buildSubItem(
@@ -771,8 +1069,9 @@ class AppSidebar extends ConsumerWidget {
     bool isDrawer,
     BuildContext context,
     ThemeData theme,
-    bool isDark,
-  ) {
+    bool isDark, {
+    String? badge,
+  }) {
     final isSelected = selectedPage == pageKey;
     final activeColor = isDark ? AppColors.brandDark : AppColors.brand;
 
@@ -805,6 +1104,8 @@ class AppSidebar extends ConsumerWidget {
             Expanded(
               child: Text(
                 label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: AppTypography.body(
                   fontSize: 13,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -812,6 +1113,22 @@ class AppSidebar extends ConsumerWidget {
                 ),
               ),
             ),
+            if (badge != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.brandDarkSoft : AppColors.brandSoft,
+                  borderRadius: AppDimensions.rPill,
+                ),
+                child: Text(
+                  badge,
+                  style: AppTypography.heading(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: activeColor,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

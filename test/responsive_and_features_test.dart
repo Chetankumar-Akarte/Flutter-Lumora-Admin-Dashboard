@@ -105,4 +105,40 @@ void main() {
     expect(find.text('MAIN'), findsOneWidget);
     expect(find.text('Home'), findsWidgets);
   });
+
+  testWidgets('Collapsed sidebar opens flyout submenu when tapped',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: LumoraApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Collapse sidebar
+    final collapseBtn = find.byTooltip('Collapse sidebar');
+    expect(collapseBtn, findsOneWidget);
+    await tester.tap(collapseBtn);
+    await tester.pumpAndSettle();
+
+    // In collapsed mode, tap on Dashboards expandable item
+    final dashboardsItem = find.byTooltip('Dashboards');
+    expect(dashboardsItem, findsOneWidget);
+    await tester.tap(dashboardsItem);
+    await tester.pumpAndSettle();
+
+    // Flyout menu should show sub items like Analytics, E-commerce, CRM
+    expect(find.text('Analytics'), findsOneWidget);
+    expect(find.text('E-commerce'), findsOneWidget);
+    expect(find.text('CRM'), findsOneWidget);
+
+    // Tap Analytics
+    await tester.tap(find.text('Analytics'));
+    await tester.pumpAndSettle();
+  });
 }
+

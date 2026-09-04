@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_dimensions.dart';
 import '../constants/app_typography.dart';
 import 'dashed_border_container.dart';
 
@@ -15,6 +14,7 @@ class AppButton extends StatefulWidget {
   final AppButtonVariant variant;
   final AppButtonSize size;
   final bool fullWidth;
+  final bool trailingIcon;
 
   const AppButton({
     super.key,
@@ -24,6 +24,7 @@ class AppButton extends StatefulWidget {
     this.variant = AppButtonVariant.primary,
     this.size = AppButtonSize.md,
     this.fullWidth = false,
+    this.trailingIcon = false,
   });
 
   @override
@@ -40,15 +41,21 @@ class _AppButtonState extends State<AppButton> {
     final isDark = theme.brightness == Brightness.dark;
 
     final fontSize = switch (widget.size) {
-      AppButtonSize.sm => 12.0,
-      AppButtonSize.md => 13.0,
-      AppButtonSize.lg => 14.0,
+      AppButtonSize.sm => 12.5,
+      AppButtonSize.md => 13.5,
+      AppButtonSize.lg => 14.5,
     };
 
     final padding = switch (widget.size) {
-      AppButtonSize.sm => const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      AppButtonSize.md => const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      AppButtonSize.lg => const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      AppButtonSize.sm => const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      AppButtonSize.md => const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+      AppButtonSize.lg => const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+    };
+
+    final borderRadius = switch (widget.size) {
+      AppButtonSize.sm => BorderRadius.circular(6),
+      AppButtonSize.md => BorderRadius.circular(8),
+      AppButtonSize.lg => BorderRadius.circular(8),
     };
 
     Color bgColor = Colors.transparent;
@@ -97,12 +104,15 @@ class _AppButtonState extends State<AppButton> {
     Widget iconContent = widget.icon ?? const SizedBox.shrink();
     if (widget.icon != null) {
       iconContent = AnimatedSlide(
-        offset: _isHovered ? const Offset(0.18, 0) : Offset.zero,
+        offset: _isHovered ? const Offset(0.08, 0) : Offset.zero,
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         child: AnimatedTheme(
           data: theme,
-          child: widget.icon!,
+          child: IconTheme(
+            data: IconThemeData(color: fgColor, size: fontSize + 1),
+            child: widget.icon!,
+          ),
         ),
       );
     }
@@ -111,17 +121,21 @@ class _AppButtonState extends State<AppButton> {
       mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        if (widget.icon != null && !widget.trailingIcon) ...[
+          iconContent,
+          const SizedBox(width: 8),
+        ],
         AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 150),
           style: AppTypography.heading(
             fontSize: fontSize,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
             color: fgColor,
           ),
           child: Text(widget.text),
         ),
-        if (widget.icon != null) ...[
-          const SizedBox(width: 6),
+        if (widget.icon != null && widget.trailingIcon) ...[
+          const SizedBox(width: 8),
           iconContent,
         ],
       ],
@@ -164,7 +178,7 @@ class _AppButtonState extends State<AppButton> {
                     padding: padding,
                     decoration: BoxDecoration(
                       color: bgColor,
-                      borderRadius: AppDimensions.rMd,
+                      borderRadius: borderRadius,
                     ),
                     child: content,
                   ),
@@ -196,7 +210,7 @@ class _AppButtonState extends State<AppButton> {
             padding: padding,
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: AppDimensions.rMd,
+              borderRadius: borderRadius,
               border: borderSide != BorderSide.none ? Border.fromBorderSide(borderSide) : null,
               boxShadow: (_isHovered && widget.variant == AppButtonVariant.primary)
                   ? [
