@@ -8,7 +8,7 @@ class NavigationState {
   const NavigationState({
     this.selectedPage = 'dashboard',
     this.isSidebarCollapsed = false,
-    this.expandedMenus = const {'dashboards'},
+    this.expandedMenus = const {},
   });
 
   NavigationState copyWith({

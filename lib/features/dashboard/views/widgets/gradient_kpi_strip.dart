@@ -16,9 +16,9 @@ class GradientKpiStrip extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         int crossAxisCount = 4;
-        if (width < 600) {
+        if (width < 520) {
           crossAxisCount = 1;
-        } else if (width < 1100) {
+        } else if (width < 820) {
           crossAxisCount = 2;
         }
 
